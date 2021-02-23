@@ -70,8 +70,6 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
   } else if(upload.status == UPLOAD_FILE_WRITE){
     //Serial.println(upload.buf);
     tft.pushColors(upload.buf, upload.currentSize);
-    tft.pushColors(upload.buf, upload.currentSize);
-    tft.pushColors(upload.buf, upload.currentSize);
     Serial.println(upload.currentSize); // Write the received bytes to the file
   } else if(upload.status == UPLOAD_FILE_END){
       Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);

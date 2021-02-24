@@ -67,6 +67,8 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
   if(upload.status == UPLOAD_FILE_START){
     String filename = upload.filename;
     Serial.print("handleFileUpload Name: "); Serial.println(filename);
+    tft.startWrite();
+    tft.setWindow(0, 0, tft.width(), tft.height()); // todo: this is probs default
   } else if(upload.status == UPLOAD_FILE_WRITE){
     //Serial.println(upload.buf);
     tft.pushColors(upload.buf, upload.currentSize);
@@ -75,31 +77,47 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
       Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
       server.sendHeader("Location","/success.html");      // Redirect the client to the success page
       server.send(303);
+      tft.endWrite();
 
   }
+}
+
+void myprint(String s){
+  Serial.print(s);
+  tft.print(s);
+}
+
+void myprintln(String s){
+  Serial.println(s);
+  tft.println(s);
 }
 
 void setup(void) {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");
 
   tft.init();
   tft.setRotation(3);
+  tft.fillScreen(TFT_WHITE);
+  tft.setFreeFont(0);
+  tft.setTextColor(TFT_BLACK);
+  tft.setCursor(10, 10);    // Set cursor near top left corner of screen
+  myprintln("");
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    myprint(".");
   }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
+  myprintln("");
+  myprint("Connected to ");
+  myprintln(ssid);
+  myprint("IP address: ");
   Serial.println(WiFi.localIP());
-
+  tft.println(WiFi.localIP());
+  
   if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
+    myprintln("MDNS responder started");
   }
 
   server.on("/", handleRoot);
@@ -115,7 +133,7 @@ void setup(void) {
   server.onNotFound(handleNotFound);
 
   server.begin();
-  Serial.println("HTTP server started");
+  myprintln("HTTP server started");
 }
 
 
